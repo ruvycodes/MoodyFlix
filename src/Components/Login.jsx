@@ -1,16 +1,39 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useValidateAuth } from '../Utils/useValidateAuth';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { auth } from "../Utils/Firebase"
+import { useDispatch } from 'react-redux';
+import { addUser, removeUser } from '../Utils/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
 
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [signUp, setSignUp] = useState(false)
   const [authMessage, setAuthMessage] = useState("")
   const [checkCnfmPassword, setCheckCnfmPassword] = useState("");
   const email = useRef()
   const password = useRef()
   const cnfmPassword = useRef()
+  const name = useRef()
+
+  useEffect(() => {
+    //onAuthstateChanged is like an event listener given by firebase which will observe the change in auth(sign in or sign out) then perform the function accordingly
+    // we have used useEffect hook with empty dependency arrat cuz we want it to run only one time not every time 
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        const { uid, email, displayName } = user;
+        dispatch(addUser({ uid: uid, email: email, name: displayName }))
+        console.log(user);
+        navigate("/")
+      } else {
+        // User is signed out
+        dispatch(removeUser())
+      }
+    });
+  }, [])
 
   const handleSignUp = () => {
     setSignUp(!signUp) //toggle
@@ -24,7 +47,9 @@ const Login = () => {
   const handleSubmit = () => {
     let message = useValidateAuth(email.current.value, password.current.value) //pass the value to the custom hook to validate
     setAuthMessage(message)
-    setCheckCnfmPassword(cnfmPassword.current.value) // set the value of cnfmPassword
+    if (signUp) { //if the user is on the signup page then only leverage the cnfmPassword , dont do it on sign in page
+      setCheckCnfmPassword(cnfmPassword.current.value) // set the value of cnfmPassword
+    }
     if (message) { // if message exists which means there was some problem thats why its not null 
       return
     }
@@ -35,6 +60,16 @@ const Login = () => {
         .then((userCredential) => {
           // Signed up 
           const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name.current.value, photoURL: " "
+          }).then(() => {
+            // Profile updated!
+            const { uid, email, displayName } = auth.currentUser; //we have used auth.currentUser because we want the latest(updated) user object , using only user will give us non updated user object
+            dispatch(addUser({ uid: uid, email: email, name: displayName }))
+            console.log(auth.currentUser, "Done");
+          }).catch((error) => {
+            console.log(error);
+          });
           console.log(user);
         })
         .catch((error) => {
@@ -48,15 +83,14 @@ const Login = () => {
 
     if (!signUp) {
       //if the user is on the sign in page
-      signInWithEmailAndPassword(auth,email.current.value, password.current.value)
+      signInWithEmailAndPassword(auth, email.current.value, password.current.value)
         .then((userCredential) => {
           // Signed in 
           const user = userCredential.user;
-          // ...
+          navigate("/")
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
+          console.log(error);
         });
     }
   }
@@ -67,7 +101,7 @@ const Login = () => {
         <h1 className='text-2xl mt-[4rem] mb-9'>{!signUp ? "Sign In" : "Sign Up"}</h1>
         <form onSubmit={(e) => e.preventDefault()} action=""> {/*this is to prevent the default behaviour of submitting the form*/}
           <div className='flex flex-col items-center mt-2'>
-            {signUp && <input className='w-64 py-2 px-3 rounded-sm mb-5' placeholder='Enter Name' type="text" name="" id="" />}
+            {signUp && <input className='w-64 py-2 px-3 rounded-sm mb-5' ref={name} placeholder='Enter Name' type="text" name="" id="" />}
             <input className='w-64 py-2 px-3 rounded-sm mb-5' ref={email} placeholder='Enter Email Address' type="text" name="" id="" />
             <input className='w-64 py-2 px-3 rounded-sm mb-5' ref={password} placeholder='Enter Password' type="text" name="" id="" />
             {signUp && <input className='w-64 py-2 px-3 rounded-sm mb-5' ref={cnfmPassword} placeholder='Confirm Password' type="text" name="" id="" />}
