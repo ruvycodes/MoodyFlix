@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useValidateAuth } from '../Utils/useValidateAuth';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../Utils/Firebase"
 import { useDispatch } from 'react-redux';
-import { addUser, removeUser } from '../Utils/userSlice';
+import { addUser } from '../Utils/userSlice';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -17,23 +17,6 @@ const Login = () => {
   const password = useRef()
   const cnfmPassword = useRef()
   const name = useRef()
-
-  useEffect(() => {
-    //onAuthstateChanged is like an event listener given by firebase which will observe the change in auth(sign in or sign out) then perform the function accordingly
-    // we have used useEffect hook with empty dependency arrat cuz we want it to run only one time not every time 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in
-        const { uid, email, displayName } = user;
-        dispatch(addUser({ uid: uid, email: email, name: displayName }))
-        console.log(user);
-        navigate("/")
-      } else {
-        // User is signed out
-        dispatch(removeUser())
-      }
-    });
-  }, [])
 
   const handleSignUp = () => {
     setSignUp(!signUp) //toggle
@@ -86,8 +69,6 @@ const Login = () => {
       signInWithEmailAndPassword(auth, email.current.value, password.current.value)
         .then((userCredential) => {
           // Signed in 
-          const user = userCredential.user;
-          navigate("/")
         })
         .catch((error) => {
           console.log(error);

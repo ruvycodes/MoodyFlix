@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import RouterError from "../Components/RouterError";
 import Login from "../Components/Login";
-import Body from "../Components/Body"
+import Browse from "../Components/Browse";
 
 const AppRouter = createBrowserRouter([
     {
@@ -16,9 +16,9 @@ const AppRouter = createBrowserRouter([
             } ,
 
             {
-                path: "body",
-                element: <Body/>
-            }
+                path: "browse",
+                element: <Browse/>
+            },
         ]
     }
 ])
