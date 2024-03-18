@@ -4,7 +4,7 @@ import MovieTrailer from './MovieTrailer'
 
 const VideoContainer = () => {
 
-  const moviesList = useSelector((store) => store.movies?.popularMovies)
+  const moviesList = useSelector((store) => store.movies?.nowPlayingMovies)
   if (!moviesList) { return } //known as early return , means return if the movieslist is not present
 
   let randomMovie = moviesList[Math.floor(Math.random() * 20)] // get random movie
