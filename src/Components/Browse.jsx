@@ -5,9 +5,13 @@ import MovieListContainer from './MovieListContainer'
 import useNowPlayingMovies from '../Utils/useNowPlayingMovies'
 import useTopRatedMovies from '../Utils/useTopRatedMovies'
 import useUpcomingMovies from '../Utils/useUpcomingMovies'
+import { useSelector } from 'react-redux'
+import GptSearch from './GptSearch'
 
 
 const Browse = () => {
+
+  let temp = useSelector((store) => store.gpt.searchButtonToggle)
 
   usePopularMovies()
   useNowPlayingMovies()
@@ -16,9 +20,11 @@ const Browse = () => {
 
   return (
     <>
-      <div>Browse</div>
-      <VideoContainer />
-      <MovieListContainer />
+      {temp ? <GptSearch /> : <div className='bg-black'>
+        <VideoContainer />
+        <MovieListContainer />
+      </div>
+      }
     </>
   )
 }

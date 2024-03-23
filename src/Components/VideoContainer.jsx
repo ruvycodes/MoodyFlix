@@ -11,9 +11,10 @@ const VideoContainer = () => {
 
   return (
     <>
-      <div className='flex flex-col absolute text-white pt-[25%] aspect-video w-full bg-gradient-to-r from-black '><span className='p-4 my-2 mx-5 font-bold text-4xl'>{randomMovie?.title}</span>
+      <div className='flex flex-col absolute text-white pt-[20%] aspect-video w-full z-[15] opacity-65'><span className='p-4 my-2 mx-5 font-bold text-4xl'>{randomMovie?.title}</span>
         <span className='p-4 my-2 mx-5 w-1/3'>{randomMovie?.overview}</span>
       </div>
+      <div className='absolute bg-gradient-to-r from-black h-[52rem] w-full z-[1]'></div>
       <MovieTrailer id={randomMovie.id} />
     </>
   )

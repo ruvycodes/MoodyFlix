@@ -3,7 +3,7 @@ import { POSTER_URL } from '../Utils/constants'
 
 const MovieCard = ({ poster }) => {
     return (
-        <div className='w-44 pr-2'><img src={POSTER_URL + poster} alt="Movie Poster" /></div>
+        <div className='w-44 pr-2 z-[20]'><img src={POSTER_URL + poster} alt="Movie Poster" /></div>
     )
 }
 
